@@ -49,6 +49,11 @@ pub struct RawArgs {
     #[arg(long)]
     pub min_bytes: Option<usize>,
 
+    /// Maximum input size (bytes) to trigger filtering; unset means no limit,
+    /// fallback to the env LFP_MAX_BYTES.
+    #[arg(long)]
+    pub max_bytes: Option<usize>,
+
     /// Raw log directory, fallback to std::env::temp_dir()/lfp.
     #[arg(long)]
     pub raw_dir: Option<std::path::PathBuf>,
@@ -72,6 +77,7 @@ pub struct Config {
     pub timeout_secs: u64,
     pub system_prompt: String,
     pub min_bytes: usize,
+    pub max_bytes: Option<usize>,
     pub raw_dir: std::path::PathBuf,
     pub passthrough: bool,
     pub source: Option<String>,
@@ -130,6 +136,17 @@ impl Config {
             },
         };
 
+        let max_bytes = match args.max_bytes {
+            Some(n) => Some(n),
+            None => env::var("LFP_MAX_BYTES")
+                .ok()
+                .map(|s| s.parse())
+                .transpose()
+                .map_err(|e| {
+                    anyhow::anyhow!("Environment variable LFP_MAX_BYTES is not a valid number: {e}")
+                })?,
+        };
+
         let raw_dir = args.raw_dir.unwrap_or_else(|| env::temp_dir().join("lfp"));
 
         Ok(Self {
@@ -140,6 +157,7 @@ impl Config {
             timeout_secs,
             system_prompt,
             min_bytes,
+            max_bytes,
             raw_dir,
             passthrough: args.passthrough,
             source: args.source,

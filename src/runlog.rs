@@ -15,6 +15,8 @@ struct RunArgs<'a> {
     timeout: u64,
     min_bytes: usize,
     #[serde(skip_serializing_if = "Option::is_none")]
+    max_bytes: Option<usize>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     source: Option<&'a str>,
 }
 
@@ -85,7 +87,12 @@ impl<'a> RunRecord<'a> {
         )
     }
 
-    pub fn skipped(cfg: &'a Config, raw_log_path: String, input_bytes: usize) -> Self {
+    pub fn skipped(
+        cfg: &'a Config,
+        raw_log_path: String,
+        input_bytes: usize,
+        reason: &'static str,
+    ) -> Self {
         Self::new(
             cfg,
             raw_log_path,
@@ -94,7 +101,7 @@ impl<'a> RunRecord<'a> {
             input_bytes,
             0,
             "skipped",
-            Some("below_min_bytes"),
+            Some(reason),
             None,
         )
     }
@@ -127,6 +134,7 @@ impl<'a> RunRecord<'a> {
                 num_ctx: cfg.num_ctx,
                 timeout: cfg.timeout_secs,
                 min_bytes: cfg.min_bytes,
+                max_bytes: cfg.max_bytes,
                 source: cfg.source.as_deref(),
             },
             system_prompt: &cfg.system_prompt,
@@ -173,6 +181,7 @@ mod tests {
             timeout_secs: 30,
             system_prompt: crate::cli::DEFAULT_SYSTEM_PROMPT.to_string(),
             min_bytes: 0,
+            max_bytes: None,
             raw_dir: PathBuf::from("/tmp/lfp"),
             passthrough: false,
             source: None,
@@ -189,6 +198,43 @@ mod tests {
         assert_eq!(json["outcome"], "ok");
         assert!(json.get("reason").is_none());
         assert!(json.get("error_detail").is_none());
+    }
+
+    #[test]
+    fn args_omits_max_bytes_when_absent() {
+        let cfg = test_config();
+        let record = RunRecord::ok(&cfg, "/tmp/lfp/lfp-1-2.log".to_string(), None, 10, 5, 100);
+
+        let json = serde_json::to_value(&record).unwrap();
+
+        assert!(json["args"].get("max_bytes").is_none());
+    }
+
+    #[test]
+    fn args_includes_max_bytes_when_present() {
+        let mut cfg = test_config();
+        cfg.max_bytes = Some(10_000);
+        let record = RunRecord::ok(&cfg, "/tmp/lfp/lfp-1-2.log".to_string(), None, 10, 5, 100);
+
+        let json = serde_json::to_value(&record).unwrap();
+
+        assert_eq!(json["args"]["max_bytes"], 10_000);
+    }
+
+    #[test]
+    fn skipped_record_serializes_given_reason() {
+        let cfg = test_config();
+        let record = RunRecord::skipped(
+            &cfg,
+            "/tmp/lfp/lfp-1-2.log".to_string(),
+            5,
+            "above_max_bytes",
+        );
+
+        let json = serde_json::to_value(&record).unwrap();
+
+        assert_eq!(json["outcome"], "skipped");
+        assert_eq!(json["reason"], "above_max_bytes");
     }
 
     #[test]

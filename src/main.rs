@@ -34,8 +34,25 @@ fn run(cfg: &Config) {
     if input.len() < cfg.min_bytes {
         print!("{input}");
 
-        let record =
-            runlog::RunRecord::skipped(cfg, raw_log_path.display().to_string(), input.len());
+        let record = runlog::RunRecord::skipped(
+            cfg,
+            raw_log_path.display().to_string(),
+            input.len(),
+            "below_min_bytes",
+        );
+        runlog::append(&cfg.raw_dir, &record);
+        return;
+    }
+
+    if cfg.max_bytes.is_some_and(|max| input.len() > max) {
+        print!("{input}");
+
+        let record = runlog::RunRecord::skipped(
+            cfg,
+            raw_log_path.display().to_string(),
+            input.len(),
+            "above_max_bytes",
+        );
         runlog::append(&cfg.raw_dir, &record);
         return;
     }
