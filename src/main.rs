@@ -23,7 +23,8 @@ fn main() -> std::process::ExitCode {
 }
 
 fn run(cfg: &Config) {
-    let raw_log_path = raw_log_path(&cfg.raw_dir);
+    let base_log_name = base_log_name();
+    let raw_log_path = cfg.raw_dir.join(format!("{base_log_name}.raw.log"));
     let input = read_stdin(&raw_log_path);
 
     if input.is_empty() {
@@ -54,9 +55,15 @@ fn run(cfg: &Config) {
                 raw_log_path.display()
             );
 
+            let filtered_log_path = cfg.raw_dir.join(format!("{base_log_name}.filtered.log"));
+            let filtered_log_path = std::fs::write(&filtered_log_path, &filtered)
+                .ok()
+                .map(|()| filtered_log_path.display().to_string());
+
             let record = runlog::RunRecord::ok(
                 cfg,
                 raw_log_path.display().to_string(),
+                filtered_log_path,
                 input.len(),
                 filtered.len(),
                 elapsed_ms,
@@ -79,14 +86,15 @@ fn run(cfg: &Config) {
     }
 }
 
-/// Path to the backup of the raw input for this execution.
-fn raw_log_path(raw_dir: &std::path::Path) -> std::path::PathBuf {
+/// Base file name (without extension) shared by the raw input and filtered output
+/// backups for this execution, e.g. `lfp-{epoch_millis}-{pid}`.
+fn base_log_name() -> String {
     let epoch_millis = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map(|d| d.as_millis())
         .unwrap_or(0);
     let pid = std::process::id();
-    raw_dir.join(format!("lfp-{epoch_millis}-{pid}.log"))
+    format!("lfp-{epoch_millis}-{pid}")
 }
 
 /// Read the entire stdin and attempt to tee the raw bytes to `raw_log_path`.

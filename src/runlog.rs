@@ -26,6 +26,8 @@ pub struct RunRecord<'a> {
     args: RunArgs<'a>,
     system_prompt: &'a str,
     raw_log_path: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    filtered_log_path: Option<String>,
     input_bytes: usize,
     output_bytes: usize,
     elapsed_ms: u128,
@@ -42,6 +44,7 @@ impl<'a> RunRecord<'a> {
     pub fn ok(
         cfg: &'a Config,
         raw_log_path: String,
+        filtered_log_path: Option<String>,
         input_bytes: usize,
         output_bytes: usize,
         elapsed_ms: u128,
@@ -49,6 +52,7 @@ impl<'a> RunRecord<'a> {
         Self::new(
             cfg,
             raw_log_path,
+            filtered_log_path,
             input_bytes,
             output_bytes,
             elapsed_ms,
@@ -70,6 +74,7 @@ impl<'a> RunRecord<'a> {
         Self::new(
             cfg,
             raw_log_path,
+            None,
             input_bytes,
             input_bytes,
             elapsed_ms,
@@ -83,6 +88,7 @@ impl<'a> RunRecord<'a> {
     fn new(
         cfg: &'a Config,
         raw_log_path: String,
+        filtered_log_path: Option<String>,
         input_bytes: usize,
         output_bytes: usize,
         elapsed_ms: u128,
@@ -108,6 +114,7 @@ impl<'a> RunRecord<'a> {
             },
             system_prompt: SYSTEM_PROMPT,
             raw_log_path,
+            filtered_log_path,
             input_bytes,
             output_bytes,
             elapsed_ms,
@@ -156,7 +163,7 @@ mod tests {
     #[test]
     fn ok_record_serializes_without_reason_and_error_detail() {
         let cfg = test_config();
-        let record = RunRecord::ok(&cfg, "/tmp/lfp/lfp-1-2.log".to_string(), 10, 5, 100);
+        let record = RunRecord::ok(&cfg, "/tmp/lfp/lfp-1-2.log".to_string(), None, 10, 5, 100);
 
         let json = serde_json::to_value(&record).unwrap();
 
@@ -168,7 +175,7 @@ mod tests {
     #[test]
     fn args_omits_source_when_absent() {
         let cfg = test_config();
-        let record = RunRecord::ok(&cfg, "/tmp/lfp/lfp-1-2.log".to_string(), 10, 5, 100);
+        let record = RunRecord::ok(&cfg, "/tmp/lfp/lfp-1-2.log".to_string(), None, 10, 5, 100);
 
         let json = serde_json::to_value(&record).unwrap();
 
@@ -179,11 +186,45 @@ mod tests {
     fn args_includes_source_when_present() {
         let mut cfg = test_config();
         cfg.source = Some("docker compose logs".to_string());
-        let record = RunRecord::ok(&cfg, "/tmp/lfp/lfp-1-2.log".to_string(), 10, 5, 100);
+        let record = RunRecord::ok(&cfg, "/tmp/lfp/lfp-1-2.log".to_string(), None, 10, 5, 100);
 
         let json = serde_json::to_value(&record).unwrap();
 
         assert_eq!(json["args"]["source"], "docker compose logs");
+    }
+
+    #[test]
+    fn ok_record_includes_filtered_log_path_when_present() {
+        let cfg = test_config();
+        let record = RunRecord::ok(
+            &cfg,
+            "/tmp/lfp/lfp-1-2.log".to_string(),
+            Some("/tmp/lfp/lfp-1-2.filtered.log".to_string()),
+            10,
+            5,
+            100,
+        );
+
+        let json = serde_json::to_value(&record).unwrap();
+
+        assert_eq!(json["filtered_log_path"], "/tmp/lfp/lfp-1-2.filtered.log");
+    }
+
+    #[test]
+    fn fail_open_record_omits_filtered_log_path() {
+        let cfg = test_config();
+        let record = RunRecord::fail_open(
+            &cfg,
+            "/tmp/lfp/lfp-1-2.log".to_string(),
+            10,
+            50,
+            "timeout",
+            "request timed out".to_string(),
+        );
+
+        let json = serde_json::to_value(&record).unwrap();
+
+        assert!(json.get("filtered_log_path").is_none());
     }
 
     #[test]
