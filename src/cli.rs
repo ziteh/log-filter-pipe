@@ -13,7 +13,7 @@ Based on the user's prompts, retain only the parts of the input that the user is
 If you are unsure whether a passage is relevant, keep it. \
 Output only the retained original content, without any explanations or Markdown markup.";
 
-/// When modifying CLI args, be sure to check whether RunArgs should be updated accordingly.
+/// When modifying CLI args, be sure to check whether README.md and RunArgs should be updated accordingly.
 #[derive(Parser, Debug)]
 #[command(
     name = "lfp",

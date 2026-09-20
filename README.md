@@ -6,13 +6,15 @@
 - **Fail-open**: If the call fails (connection failure, timeout, or invalid response), the original content is printed and the exit code remains 0.
 - **Exit code passthrough**: `lfp` does not override the upstream command's exit code. Combined with Bash's `set -o pipefail`, this preserves the correct result.
 
+> This repo contains LLM-assisted code — please thoroughly review and validate it for quality, correctness, and security prior to use.
+
 ## Usage
 
 ```bash
-lfp -p/--prompt <TEXT> [-m/--model <NAME>] [--base-url <URL>] [--num-ctx <N>]
-    [-t/--timeout <SECS>] [--system-prompt <TEXT>] [--min-bytes <N>] [--max-bytes <N>]
-    [--raw-dir <PATH>] [--passthrough] [--source <TEXT>] [-q/--quiet]
+lfp -p <PROMPT> [OPTIONS]
 ```
+
+Run `lfp --help` for the full option list.
 
 | Option            | Description                                                                              | Environment variable | Default                  |
 | ----------------- | ---------------------------------------------------------------------------------------- | -------------------- | ------------------------ |
@@ -49,7 +51,7 @@ echo $?   # Reflects the result of docker compose logs, not lfp
 
 ### Hook
 
-`lfp` can be wired into a [Claude Code](https://claude.com/product/claude-code) `PreToolUse` hook to filter noisy `Bash` output (such as build or install logs) before it reaches the model's context. The hook rewrites the matched command to pipe its output through `lfp`. Use `--quiet` here so the agent doesn't see the raw log path in the diagnostic message and go read it directly, defeating the filtering.
+`lfp` can be wired into a [Claude Code `PreToolUse` hook](https://code.claude.com/docs/en/hooks#pretooluse) to filter noisy `Bash` output (such as build or install logs) before it reaches the model's context. The hook rewrites the matched command to pipe its output through `lfp`. Use `--quiet` here so the agent doesn't see the raw log path in the diagnostic message and go read it directly, defeating the filtering.
 
 `~/.claude/hooks/lfp-shadow.sh`:
 
@@ -112,19 +114,15 @@ cargo test
 
 ### Run Records
 
-In addition to the raw log (the backup of stdin), each `lfp` run appends one JSON Lines record to `{raw-dir}/runs.jsonl`. This makes it possible to evaluate filtering results and compare different prompts and models later. The record includes the invocation parameters (including `--source` when provided, so the source command for the raw data can be identified), the raw log path, input/output byte counts, elapsed time, the `passthrough` flag, and `outcome` (`ok` or `fail_open`; `fail_open` records `reason` and `error_detail`). The actual Ollama response is not recorded. Write failures for this log are silently ignored and do not affect the main flow.
+In addition to the raw log (the backup of stdin), each `lfp` run appends one JSON Lines record to `{raw-dir}/runs.jsonl`, so filtering results can be evaluated and prompts/models compared later. See [`RunRecord`](src/runlog.rs) for the exact fields. Write failures for this log are silently ignored and do not affect the main flow.
 
 ### Shadow Deployment
 
-Collect data before going live.
-
-With `--passthrough`, `lfp` still calls the LLM as usual and records the result in `runs.jsonl` (for evaluating filtering and comparing prompts/models later), but stdout always prints the original input directly, so filtering results do not affect downstream processes. This is useful for collecting data for a while before relying on filtered results in production:
+Collect data before going live: run with `--passthrough` for a while, check `runs.jsonl` for quality, then drop the flag to apply filtering.
 
 ```bash
 docker compose logs | lfp --prompt 'keep permission-related information' --model gemma4:26b --passthrough
 ```
-
-After verifying the filtering quality, remove `--passthrough` to apply the filtered results.
 
 ## Benchmarks
 
