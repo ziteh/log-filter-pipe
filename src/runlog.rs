@@ -5,7 +5,6 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use serde::Serialize;
 
 use crate::cli::Config;
-use crate::llm::SYSTEM_PROMPT;
 
 #[derive(Serialize)]
 struct RunArgs<'a> {
@@ -112,7 +111,7 @@ impl<'a> RunRecord<'a> {
                 timeout: cfg.timeout_secs,
                 source: cfg.source.as_deref(),
             },
-            system_prompt: SYSTEM_PROMPT,
+            system_prompt: &cfg.system_prompt,
             raw_log_path,
             filtered_log_path,
             input_bytes,
@@ -154,6 +153,7 @@ mod tests {
             base_url: "http://localhost:11434".to_string(),
             num_ctx: Some(4096),
             timeout_secs: 30,
+            system_prompt: crate::cli::DEFAULT_SYSTEM_PROMPT.to_string(),
             raw_dir: PathBuf::from("/tmp/lfp"),
             passthrough: false,
             source: None,

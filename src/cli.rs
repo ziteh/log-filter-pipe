@@ -6,6 +6,10 @@ const DEFAULT_BASE_URL: &str = "http://localhost:11434";
 
 const DEFAULT_TIMEOUT_SECS: u64 = 30;
 
+pub(crate) const DEFAULT_SYSTEM_PROMPT: &str = "You are a log filter. \
+Based on the user's prompts, retain only the parts of the input that the user is interested in. \
+Output only the retained original content, without any explanations or Markdown markup.";
+
 #[derive(Parser, Debug)]
 #[command(
     name = "lfp",
@@ -32,6 +36,10 @@ pub struct RawArgs {
     #[arg(short, long)]
     pub timeout: Option<u64>,
 
+    /// System prompt, fallback to the env LFP_SYSTEM_PROMPT.
+    #[arg(long)]
+    pub system_prompt: Option<String>,
+
     /// Raw log directory, fallback to std::env::temp_dir()/lfp.
     #[arg(long)]
     pub raw_dir: Option<std::path::PathBuf>,
@@ -53,6 +61,7 @@ pub struct Config {
     pub base_url: String,
     pub num_ctx: Option<u32>,
     pub timeout_secs: u64,
+    pub system_prompt: String,
     pub raw_dir: std::path::PathBuf,
     pub passthrough: bool,
     pub source: Option<String>,
@@ -96,6 +105,11 @@ impl Config {
             },
         };
 
+        let system_prompt = args
+            .system_prompt
+            .or_else(|| env::var("LFP_SYSTEM_PROMPT").ok())
+            .unwrap_or_else(|| DEFAULT_SYSTEM_PROMPT.to_string());
+
         let raw_dir = args.raw_dir.unwrap_or_else(|| env::temp_dir().join("lfp"));
 
         Ok(Self {
@@ -104,6 +118,7 @@ impl Config {
             base_url,
             num_ctx,
             timeout_secs,
+            system_prompt,
             raw_dir,
             passthrough: args.passthrough,
             source: args.source,

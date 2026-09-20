@@ -10,19 +10,20 @@
 
 ```bash
 lfp -p/--prompt <TEXT> [-m/--model <NAME>] [--base-url <URL>] [--num-ctx <N>]
-    [-t/--timeout <SECS>] [--raw-dir <PATH>] [--passthrough] [--source <TEXT>]
+    [-t/--timeout <SECS>] [--system-prompt <TEXT>] [--raw-dir <PATH>] [--passthrough] [--source <TEXT>]
 ```
 
-| Option          | Description                                                                              | Environment variable | Default                  |
-| --------------- | ---------------------------------------------------------------------------------------- | -------------------- | ------------------------ |
-| `-p, --prompt`  | Filtering instructions (required)                                                        | -                    | -                        |
-| `-m, --model`   | LLM model name (required)                                                                | `LFP_MODEL`          | -                        |
-| `--base-url`    | LLM base URL                                                                             | `LFP_BASE_URL`       | `http://localhost:11434` |
-| `--num-ctx`     | Ollama `options.num_ctx`                                                                 | `LFP_NUM_CTX`        | Not set                  |
-| `-t, --timeout` | Timeout in seconds for each LLM request                                                  | `LFP_TIMEOUT`        | `30`                     |
-| `--raw-dir`     | Directory for storing raw input                                                          | -                    | `$TMPDIR/lfp`            |
-| `--passthrough` | Always output the original input while still calling the LLM and writing to `runs.jsonl` | -                    | Not set                  |
-| `--source`      | Source command for the raw input, written to `runs.jsonl` for later analysis             | -                    | Not set                  |
+| Option            | Description                                                                              | Environment variable | Default                  |
+| ----------------- | ---------------------------------------------------------------------------------------- | -------------------- | ------------------------ |
+| `-p, --prompt`    | Filtering instructions (required)                                                        | -                    | -                        |
+| `-m, --model`     | LLM model name (required)                                                                | `LFP_MODEL`          | -                        |
+| `--base-url`      | LLM base URL                                                                             | `LFP_BASE_URL`       | `http://localhost:11434` |
+| `--num-ctx`       | Ollama `options.num_ctx`                                                                 | `LFP_NUM_CTX`        | Not set                  |
+| `-t, --timeout`   | Timeout in seconds for each LLM request                                                  | `LFP_TIMEOUT`        | `30`                     |
+| `--system-prompt` | System prompt sent to the LLM                                                            | `LFP_SYSTEM_PROMPT`  | Built-in default         |
+| `--raw-dir`       | Directory for storing raw input                                                          | -                    | `$TMPDIR/lfp`            |
+| `--passthrough`   | Always output the original input while still calling the LLM and writing to `runs.jsonl` | -                    | Not set                  |
+| `--source`        | Source command for the raw input, written to `runs.jsonl` for later analysis             | -                    | Not set                  |
 
 > CLI flags take precedence over environment variables.
 

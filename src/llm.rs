@@ -2,10 +2,6 @@ use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 
-pub const SYSTEM_PROMPT: &str = "You are a log filter. \
-Based on the user's prompts, retain only the parts of the input that the user is interested in. \
-Output only the retained original content, without any explanations or Markdown markup.";
-
 /// /api/generate request body.
 #[derive(Serialize)]
 struct OllamaRequest<'a> {
@@ -58,13 +54,14 @@ pub struct LlmError {
 pub fn generate(
     base_url: &str,
     model: &str,
+    system_prompt: &str,
     user_prompt: &str,
     input: &str,
     num_ctx: Option<u32>,
     timeout: Duration,
 ) -> Result<String, LlmError> {
     let full_prompt =
-        format!("{SYSTEM_PROMPT}\n\nUser Prompt: {user_prompt}\n\nOriginal Content:\n{input}");
+        format!("{system_prompt}\n\nUser Prompt: {user_prompt}\n\nOriginal Content:\n{input}");
 
     let body = OllamaRequest {
         model,

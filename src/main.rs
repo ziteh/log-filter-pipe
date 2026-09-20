@@ -36,6 +36,7 @@ fn run(cfg: &Config) {
     let result = llm::generate(
         &cfg.base_url,
         &cfg.model,
+        &cfg.system_prompt,
         &cfg.prompt,
         &input,
         cfg.num_ctx,
