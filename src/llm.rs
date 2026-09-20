@@ -2,6 +2,9 @@ use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 
+/// Low temperature for extraction-style filtering.
+const TEMPERATURE: f32 = 0.1;
+
 /// /api/generate request body.
 #[derive(Serialize)]
 struct OllamaRequest<'a> {
@@ -10,13 +13,14 @@ struct OllamaRequest<'a> {
     stream: bool,
     /// Disable thinking output for models that support it.
     think: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    options: Option<OllamaOptions>,
+    options: OllamaOptions,
 }
 
 #[derive(Serialize)]
 struct OllamaOptions {
-    num_ctx: u32,
+    temperature: f32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    num_ctx: Option<u32>,
 }
 
 /// /api/generate response body.
@@ -68,7 +72,10 @@ pub fn generate(
         prompt: &full_prompt,
         stream: false,
         think: false,
-        options: num_ctx.map(|num_ctx| OllamaOptions { num_ctx }),
+        options: OllamaOptions {
+            temperature: TEMPERATURE,
+            num_ctx,
+        },
     };
 
     let config = ureq::Agent::config_builder()
@@ -120,18 +127,21 @@ mod tests {
     use super::*;
 
     #[test]
-    fn generate_request_serializes_without_options_when_num_ctx_absent() {
+    fn generate_request_omits_num_ctx_when_absent() {
         let req = OllamaRequest {
             model: "llama3.1",
             prompt: "hello",
             stream: false,
             think: false,
-            options: None,
+            options: OllamaOptions {
+                temperature: TEMPERATURE,
+                num_ctx: None,
+            },
         };
 
         let json = serde_json::to_value(&req).unwrap();
 
-        assert_eq!(json.get("options"), None);
+        assert_eq!(json["options"].get("num_ctx"), None);
     }
 
     #[test]
@@ -141,7 +151,10 @@ mod tests {
             prompt: "hello",
             stream: false,
             think: false,
-            options: None,
+            options: OllamaOptions {
+                temperature: TEMPERATURE,
+                num_ctx: None,
+            },
         };
 
         let json = serde_json::to_value(&req).unwrap();
@@ -156,12 +169,33 @@ mod tests {
             prompt: "hello",
             stream: false,
             think: false,
-            options: Some(OllamaOptions { num_ctx: 4096 }),
+            options: OllamaOptions {
+                temperature: TEMPERATURE,
+                num_ctx: Some(4096),
+            },
         };
 
         let json = serde_json::to_value(&req).unwrap();
 
         assert_eq!(json["options"]["num_ctx"], 4096);
+    }
+
+    #[test]
+    fn generate_request_serializes_temperature() {
+        let req = OllamaRequest {
+            model: "llama3.1",
+            prompt: "hello",
+            stream: false,
+            think: false,
+            options: OllamaOptions {
+                temperature: TEMPERATURE,
+                num_ctx: None,
+            },
+        };
+
+        let json = serde_json::to_value(&req).unwrap();
+
+        assert_eq!(json["options"]["temperature"], TEMPERATURE);
     }
 
     #[test]
