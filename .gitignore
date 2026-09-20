@@ -1,0 +1,18 @@
+# Rust
+debug
+target
+**/*.rs.bk
+rustc-ice-*.txt
+
+# Misc
+logs/
+*.log
+*.bak
+.env
+*.local
+*.local.*
+
+# OS
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
