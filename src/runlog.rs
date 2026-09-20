@@ -27,6 +27,7 @@ pub struct RunRecord<'a> {
     input_bytes: usize,
     output_bytes: usize,
     elapsed_ms: u128,
+    passthrough: bool,
     outcome: &'static str,
     #[serde(skip_serializing_if = "Option::is_none")]
     reason: Option<&'static str>,
@@ -107,6 +108,7 @@ impl<'a> RunRecord<'a> {
             input_bytes,
             output_bytes,
             elapsed_ms,
+            passthrough: cfg.passthrough,
             outcome,
             reason,
             error_detail,
@@ -143,6 +145,7 @@ mod tests {
             num_ctx: Some(4096),
             timeout_secs: 30,
             raw_dir: PathBuf::from("/tmp/lfp"),
+            passthrough: false,
         }
     }
 

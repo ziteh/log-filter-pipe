@@ -35,6 +35,11 @@ pub struct RawArgs {
     /// Raw log directory, fallback to std::env::temp_dir()/lfp.
     #[arg(long)]
     pub raw_dir: Option<std::path::PathBuf>,
+
+    /// Always output the original input as-is,
+    /// while still calling the LLM and logging the execution details (shadow deployment).
+    #[arg(long)]
+    pub passthrough: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -45,6 +50,7 @@ pub struct Config {
     pub num_ctx: Option<u32>,
     pub timeout_secs: u64,
     pub raw_dir: std::path::PathBuf,
+    pub passthrough: bool,
 }
 
 impl Config {
@@ -94,6 +100,7 @@ impl Config {
             num_ctx,
             timeout_secs,
             raw_dir,
+            passthrough: args.passthrough,
         })
     }
 }

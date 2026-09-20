@@ -44,7 +44,11 @@ fn run(cfg: &Config) {
 
     match result {
         Ok(filtered) => {
-            print!("{filtered}");
+            if cfg.passthrough {
+                print!("{input}");
+            } else {
+                print!("{filtered}");
+            }
             eprintln!(
                 "[lfp] output filtered; raw input: {}",
                 raw_log_path.display()
