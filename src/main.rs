@@ -31,6 +31,15 @@ fn run(cfg: &Config) {
         return;
     }
 
+    if input.len() < cfg.min_bytes {
+        print!("{input}");
+
+        let record =
+            runlog::RunRecord::skipped(cfg, raw_log_path.display().to_string(), input.len());
+        runlog::append(&cfg.raw_dir, &record);
+        return;
+    }
+
     let started = Instant::now();
     let timeout = Duration::from_secs(cfg.timeout_secs);
     let result = llm::generate(

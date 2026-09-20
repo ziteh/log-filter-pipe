@@ -10,7 +10,8 @@
 
 ```bash
 lfp -p/--prompt <TEXT> [-m/--model <NAME>] [--base-url <URL>] [--num-ctx <N>]
-    [-t/--timeout <SECS>] [--system-prompt <TEXT>] [--raw-dir <PATH>] [--passthrough] [--source <TEXT>]
+    [-t/--timeout <SECS>] [--system-prompt <TEXT>] [--min-bytes <N>]
+    [--raw-dir <PATH>] [--passthrough] [--source <TEXT>]
 ```
 
 | Option            | Description                                                                              | Environment variable | Default                  |
@@ -21,6 +22,7 @@ lfp -p/--prompt <TEXT> [-m/--model <NAME>] [--base-url <URL>] [--num-ctx <N>]
 | `--num-ctx`       | Ollama `options.num_ctx`                                                                 | `LFP_NUM_CTX`        | Not set                  |
 | `-t, --timeout`   | Timeout in seconds for each LLM request                                                  | `LFP_TIMEOUT`        | `30`                     |
 | `--system-prompt` | System prompt sent to the LLM                                                            | `LFP_SYSTEM_PROMPT`  | Built-in default         |
+| `--min-bytes`     | Minimum input size (bytes) to trigger filtering; `0` always filters                      | `LFP_MIN_BYTES`      | `200`                    |
 | `--raw-dir`       | Directory for storing raw input                                                          | -                    | `$TMPDIR/lfp`            |
 | `--passthrough`   | Always output the original input while still calling the LLM and writing to `runs.jsonl` | -                    | Not set                  |
 | `--source`        | Source command for the raw input, written to `runs.jsonl` for later analysis             | -                    | Not set                  |

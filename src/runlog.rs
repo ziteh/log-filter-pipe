@@ -13,6 +13,7 @@ struct RunArgs<'a> {
     base_url: &'a str,
     num_ctx: Option<u32>,
     timeout: u64,
+    min_bytes: usize,
     #[serde(skip_serializing_if = "Option::is_none")]
     source: Option<&'a str>,
 }
@@ -83,6 +84,20 @@ impl<'a> RunRecord<'a> {
         )
     }
 
+    pub fn skipped(cfg: &'a Config, raw_log_path: String, input_bytes: usize) -> Self {
+        Self::new(
+            cfg,
+            raw_log_path,
+            None,
+            input_bytes,
+            input_bytes,
+            0,
+            "skipped",
+            Some("below_min_bytes"),
+            None,
+        )
+    }
+
     #[allow(clippy::too_many_arguments)]
     fn new(
         cfg: &'a Config,
@@ -109,6 +124,7 @@ impl<'a> RunRecord<'a> {
                 base_url: &cfg.base_url,
                 num_ctx: cfg.num_ctx,
                 timeout: cfg.timeout_secs,
+                min_bytes: cfg.min_bytes,
                 source: cfg.source.as_deref(),
             },
             system_prompt: &cfg.system_prompt,
@@ -154,6 +170,7 @@ mod tests {
             num_ctx: Some(4096),
             timeout_secs: 30,
             system_prompt: crate::cli::DEFAULT_SYSTEM_PROMPT.to_string(),
+            min_bytes: 0,
             raw_dir: PathBuf::from("/tmp/lfp"),
             passthrough: false,
             source: None,

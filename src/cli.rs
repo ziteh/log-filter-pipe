@@ -6,10 +6,14 @@ const DEFAULT_BASE_URL: &str = "http://localhost:11434";
 
 const DEFAULT_TIMEOUT_SECS: u64 = 30;
 
+const DEFAULT_MIN_BYTES: usize = 200;
+
 pub(crate) const DEFAULT_SYSTEM_PROMPT: &str = "You are a log filter. \
 Based on the user's prompts, retain only the parts of the input that the user is interested in. \
+If you are unsure whether a passage is relevant, keep it. \
 Output only the retained original content, without any explanations or Markdown markup.";
 
+/// When modifying CLI args, be sure to check whether RunArgs should be updated accordingly.
 #[derive(Parser, Debug)]
 #[command(
     name = "lfp",
@@ -40,6 +44,11 @@ pub struct RawArgs {
     #[arg(long)]
     pub system_prompt: Option<String>,
 
+    /// Minimum input size (bytes) to trigger filtering; 0 always filters,
+    /// fallback to the env LFP_MIN_BYTES.
+    #[arg(long)]
+    pub min_bytes: Option<usize>,
+
     /// Raw log directory, fallback to std::env::temp_dir()/lfp.
     #[arg(long)]
     pub raw_dir: Option<std::path::PathBuf>,
@@ -62,6 +71,7 @@ pub struct Config {
     pub num_ctx: Option<u32>,
     pub timeout_secs: u64,
     pub system_prompt: String,
+    pub min_bytes: usize,
     pub raw_dir: std::path::PathBuf,
     pub passthrough: bool,
     pub source: Option<String>,
@@ -110,6 +120,16 @@ impl Config {
             .or_else(|| env::var("LFP_SYSTEM_PROMPT").ok())
             .unwrap_or_else(|| DEFAULT_SYSTEM_PROMPT.to_string());
 
+        let min_bytes = match args.min_bytes {
+            Some(n) => n,
+            None => match env::var("LFP_MIN_BYTES").ok() {
+                Some(s) => s.parse().map_err(|e| {
+                    anyhow::anyhow!("Environment variable LFP_MIN_BYTES is not a valid number: {e}")
+                })?,
+                None => DEFAULT_MIN_BYTES,
+            },
+        };
+
         let raw_dir = args.raw_dir.unwrap_or_else(|| env::temp_dir().join("lfp"));
 
         Ok(Self {
@@ -119,6 +139,7 @@ impl Config {
             num_ctx,
             timeout_secs,
             system_prompt,
+            min_bytes,
             raw_dir,
             passthrough: args.passthrough,
             source: args.source,
