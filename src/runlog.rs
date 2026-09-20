@@ -23,6 +23,7 @@ struct RunArgs<'a> {
 pub struct RunRecord<'a> {
     ts: u64,
     pid: u32,
+    version: &'static str,
     args: RunArgs<'a>,
     system_prompt: &'a str,
     raw_log_path: String,
@@ -118,6 +119,7 @@ impl<'a> RunRecord<'a> {
         Self {
             ts,
             pid: std::process::id(),
+            version: env!("CARGO_PKG_VERSION"),
             args: RunArgs {
                 prompt: &cfg.prompt,
                 model: &cfg.model,
