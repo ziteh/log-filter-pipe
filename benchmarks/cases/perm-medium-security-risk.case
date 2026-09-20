@@ -1,0 +1,13 @@
+FIXTURE: ls-la-permissions.txt
+DIFFICULTY: medium
+PROMPT: Keep only items with security-sensitive permissions: other has w permission (world-writable), or the file has setuid (s in the owner's x position).
+KEEP:
+notes.txt
+shared-tmp
+backup-agent
+DROP:
+README.md
+secrets.env
+config.yaml
+private
+current -> releases/2026.06.01

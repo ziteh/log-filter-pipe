@@ -1,0 +1,12 @@
+FIXTURE: go-build-vet.txt
+DIFFICULTY: hard
+PROMPT: Keep only messages whose error line number (the first colon-separated number after the filename) is greater than 20
+KEEP:
+user.go:23:6: undefined: userRepo
+user.go:45:15: cannot use id
+payment.go:88:10: too many return values
+logger.go:30:2: Printf call has arguments
+logger.go:55:2: possible misuse of unsafe.Pointer
+DROP:
+order.go:12:2: imported and not used
+retry.go:15:9: missing return

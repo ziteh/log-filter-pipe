@@ -1,0 +1,13 @@
+FIXTURE: cargo-test-output.txt
+DIFFICULTY: hard
+PROMPT: List only the full function names of failed tests (the full paths on lines that start with test and end with FAILED). Do not keep panic messages, warnings, passing tests, or the test result summary line.
+KEEP:
+llm::tests::generate_request_always_disables_thinking
+runlog::tests::fail_open_record_serializes_reason_and_error_detail
+DROP:
+panicked at
+test result: FAILED
+warning:
+Compiling log-filter-pipe
+test cli::tests::parses_prompt_flag ... ok
+assertion

@@ -1,0 +1,15 @@
+total 52
+drwxr-xr-x  12 root  wheel    384 Jun  1 09:00 .
+drwxr-xr-x   6 root  wheel    192 May 20 10:00 ..
+-rw-r--r--   1 alice staff   1240 Jun  1 08:45 README.md
+-rwxr-xr-x   1 alice staff   8192 Jun  1 08:50 deploy.sh
+-rwsr-xr-x   1 root  wheel  15360 May 15 12:00 backup-agent
+-rw-rw-rw-   1 alice staff    512 Jun  1 08:55 notes.txt
+drwxrwxrwx   2 alice staff    128 Jun  1 08:56 shared-tmp
+-rw-------   1 root  wheel   2048 May 30 22:10 secrets.env
+lrwxr-xr-x   1 alice staff     24 Jun  1 08:47 current -> releases/2026.06.01
+-rw-r--r--   1 bob   staff   4096 May 28 14:20 config.yaml
+-rwxr-xr-x   1 bob   staff   2048 May 28 14:22 run.sh
+drwxr-x---   3 root  wheel     96 Apr 10 09:00 private
+-r--rw-r--   1 alice staff    256 Jun  1 08:58 odd-perms.conf
+-rw-r--rwx   1 alice staff    256 Jun  1 08:59 legacy.sh

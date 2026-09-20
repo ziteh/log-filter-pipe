@@ -1,0 +1,46 @@
+   Compiling log-filter-pipe v0.1.0 (/Users/user/project)
+warning: unused import: `std::fmt`
+ --> src/cli.rs:3:5
+  |
+3 | use std::fmt;
+  | ^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused variable: `count`
+ --> src/runlog.rs:88:9
+  |
+88 |     let count = records.len();
+  |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_count`
+
+warning: `log-filter-pipe` (bin "lfp") generated 2 warnings
+    Finished test [unoptimized + debuginfo] target(s) in 3.21s
+     Running unittests src/main.rs (target/debug/deps/lfp-abc123)
+
+running 6 tests
+test cli::tests::parses_prompt_flag ... ok
+test tee::tests::read_copies_all_bytes_into_sink ... ok
+test tee::tests::read_continues_when_sink_write_fails ... ok
+test llm::tests::generate_request_always_disables_thinking ... FAILED
+test runlog::tests::ok_record_serializes_without_reason_and_error_detail ... ok
+test runlog::tests::fail_open_record_serializes_reason_and_error_detail ... FAILED
+
+failures:
+
+---- llm::tests::generate_request_always_disables_thinking stdout ----
+thread 'llm::tests::generate_request_always_disables_thinking' panicked at src/llm.rs:152:9:
+assertion `left == right` failed
+  left: Bool(true)
+ right: Bool(false)
+
+---- runlog::tests::fail_open_record_serializes_reason_and_error_detail stdout ----
+thread 'runlog::tests::fail_open_record_serializes_reason_and_error_detail' panicked at src/runlog.rs:176:9:
+assertion failed: `(left == right)`
+
+failures:
+    llm::tests::generate_request_always_disables_thinking
+    runlog::tests::fail_open_record_serializes_reason_and_error_detail
+
+test result: FAILED. 4 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `--bin lfp`

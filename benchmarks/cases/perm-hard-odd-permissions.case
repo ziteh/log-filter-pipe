@@ -1,0 +1,13 @@
+FIXTURE: ls-la-permissions.txt
+DIFFICULTY: hard
+PROMPT: Keep only items with unusual permission combinations: the owner lacks w but the group has w, or the other permissions are more permissive than the group permissions (for example, other has w or x but the group does not).
+KEEP:
+odd-perms.conf
+legacy.sh
+DROP:
+deploy.sh
+notes.txt
+backup-agent
+README.md
+config.yaml
+run.sh

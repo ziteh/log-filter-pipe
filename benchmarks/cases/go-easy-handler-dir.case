@@ -1,0 +1,11 @@
+FIXTURE: go-build-vet.txt
+DIFFICULTY: easy
+PROMPT: Keep only errors under the handler directory
+KEEP:
+./handler/user.go:23:6: undefined: userRepo
+./handler/user.go:45:15: cannot use id
+./handler/order.go:12:2: imported and not used
+DROP:
+./service/payment.go
+./util/retry.go
+vet: ./util/logger.go

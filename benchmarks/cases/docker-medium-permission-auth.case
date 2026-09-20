@@ -1,0 +1,14 @@
+FIXTURE: docker-compose-logs.txt
+DIFFICULTY: medium
+PROMPT: Keep errors related to permissions or authentication (for example, permission denied or authentication failures). Do not keep general info or health-check messages.
+KEEP:
+Traceback (most recent call last)
+File "/app/logger.py", line 42
+    f.write(line)
+PermissionError: [Errno 13] Permission denied
+AuthenticationError: invalid API token
+DROP:
+Slow query detected
+connection to client lost
+Ready to accept connections
+GET /healthz 200

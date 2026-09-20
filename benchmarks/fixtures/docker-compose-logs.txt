@@ -1,0 +1,21 @@
+web-1    | 2024-06-01T09:00:01.001Z [INFO] Starting web server on port 8080
+web-1    | 2024-06-01T09:00:01.203Z [INFO] Connected to database
+web-1    | 2024-06-01T09:00:02.500Z [INFO] GET /healthz 200 3ms
+web-1    | 2024-06-01T09:00:07.500Z [INFO] GET /healthz 200 2ms
+web-1    | 2024-06-01T09:00:12.500Z [INFO] GET /healthz 200 2ms
+db-1     | 2024-06-01T09:00:00.100Z [INFO] PostgreSQL init process complete
+db-1     | 2024-06-01T09:00:00.200Z [INFO] database system is ready to accept connections
+redis-1  | 2024-06-01T09:00:00.050Z [INFO] Ready to accept connections
+web-1    | 2024-06-01T09:01:15.812Z [WARN] Slow query detected: SELECT * FROM orders (842ms)
+web-1    | 2024-06-01T09:02:30.040Z [ERROR] Failed to write access log
+web-1    | 2024-06-01T09:02:30.046Z [ERROR] Traceback (most recent call last):
+web-1    | 2024-06-01T09:02:30.046Z [ERROR]   File "/app/logger.py", line 42, in write_log
+web-1    | 2024-06-01T09:02:30.046Z [ERROR]     f.write(line)
+web-1    | 2024-06-01T09:02:30.046Z [ERROR] PermissionError: [Errno 13] Permission denied: '/var/log/app/access.log'
+web-1    | 2024-06-01T09:02:30.050Z [INFO] Retrying with fallback log path /tmp/app.log
+db-1     | 2024-06-01T09:03:00.900Z [WARN] connection to client lost
+redis-1  | 2024-06-01T09:03:12.100Z [INFO] 10 changes in 900 seconds. Saving...
+web-1    | 2024-06-01T09:03:45.221Z [ERROR] AuthenticationError: invalid API token for user 'svc-deploy'
+web-1    | 2024-06-01T09:03:45.222Z [INFO] Rejected request from 10.0.0.5
+web-1    | 2024-06-01T09:04:01.000Z [INFO] GET /healthz 200 2ms
+web-1    | 2024-06-01T09:04:06.000Z [INFO] GET /healthz 200 2ms

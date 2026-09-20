@@ -1,0 +1,11 @@
+FIXTURE: go-build-vet.txt
+DIFFICULTY: medium
+PROMPT: Keep only messages produced by go vet (the lines beginning with vet:). Do not keep compiler errors.
+KEEP:
+vet: ./util/logger.go:30:2: Printf call has arguments but no formatting directives
+vet: ./util/logger.go:55:2: possible misuse of unsafe.Pointer
+DROP:
+undefined: userRepo
+imported and not used
+too many return values
+missing return

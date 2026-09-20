@@ -1,0 +1,16 @@
+FIXTURE: docker-compose-logs.txt
+DIFFICULTY: easy
+PROMPT: Keep only messages at the [ERROR] level
+KEEP:
+Failed to write access log
+Traceback (most recent call last)
+File "/app/logger.py", line 42
+    f.write(line)
+PermissionError: [Errno 13] Permission denied
+AuthenticationError: invalid API token
+DROP:
+Starting web server on port 8080
+GET /healthz 200
+Slow query detected
+Ready to accept connections
+10 changes in 900 seconds

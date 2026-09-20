@@ -1,0 +1,13 @@
+FIXTURE: cargo-test-output.txt
+DIFFICULTY: medium
+PROMPT: Keep only content related to failed tests (which tests FAILED and their corresponding panic messages). Do not keep passing tests or warnings.
+KEEP:
+llm::tests::generate_request_always_disables_thinking ... FAILED
+fail_open_record_serializes_reason_and_error_detail ... FAILED
+panicked at src/llm.rs:152:9
+panicked at src/runlog.rs:176:9
+test result: FAILED. 4 passed; 2 failed
+DROP:
+test cli::tests::parses_prompt_flag ... ok
+warning: unused import
+Compiling log-filter-pipe

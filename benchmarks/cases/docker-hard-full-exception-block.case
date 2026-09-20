@@ -1,0 +1,14 @@
+FIXTURE: docker-compose-logs.txt
+DIFFICULTY: hard
+PROMPT: Keep only the complete exception traceback log block. Preserve the entire block, from the opening Traceback line through the final exception message. Do not keep only the line matching a keyword, and do not keep other errors unrelated to this traceback.
+KEEP:
+Traceback (most recent call last)
+File "/app/logger.py", line 42
+    f.write(line)
+PermissionError: [Errno 13] Permission denied
+DROP:
+AuthenticationError: invalid API token
+Slow query detected
+Ready to accept connections
+GET /healthz 200
+Rejected request from 10.0.0.5

@@ -1,0 +1,13 @@
+FIXTURE: cargo-test-output.txt
+DIFFICULTY: easy
+PROMPT: Keep only warning-related content
+KEEP:
+warning: unused import: `std::fmt`
+use std::fmt;
+warning: unused variable: `count`
+let count = records.len();
+warning: `log-filter-pipe` (bin "lfp") generated 2 warnings
+DROP:
+running 6 tests
+test cli::tests::parses_prompt_flag
+test result: FAILED

@@ -1,0 +1,15 @@
+# github.com/example/api/handler
+./handler/user.go:23:6: undefined: userRepo
+./handler/user.go:45:15: cannot use id (variable of type string) as int value in argument to FindByID
+./handler/order.go:12:2: imported and not used: "fmt"
+
+# github.com/example/api/service
+./service/payment.go:88:10: too many return values
+	have (error)
+	want (int, error)
+
+# github.com/example/api/util
+./util/retry.go:15:9: missing return
+
+vet: ./util/logger.go:30:2: Printf call has arguments but no formatting directives
+vet: ./util/logger.go:55:2: possible misuse of unsafe.Pointer

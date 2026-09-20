@@ -1,0 +1,13 @@
+FIXTURE: ls-la-permissions.txt
+DIFFICULTY: easy
+PROMPT: Keep only executable files (regular files with owner x permission). Do not include directories or symlinks.
+KEEP:
+deploy.sh
+backup-agent
+run.sh
+DROP:
+README.md
+notes.txt
+config.yaml
+secrets.env
+current -> releases/2026.06.01
