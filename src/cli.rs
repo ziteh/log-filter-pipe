@@ -40,6 +40,10 @@ pub struct RawArgs {
     /// while still calling the LLM and logging the execution details (shadow deployment).
     #[arg(long)]
     pub passthrough: bool,
+
+    /// Source of the raw input (e.g., the upstream command), recorded in the run log for analysis.
+    #[arg(long)]
+    pub source: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -51,6 +55,7 @@ pub struct Config {
     pub timeout_secs: u64,
     pub raw_dir: std::path::PathBuf,
     pub passthrough: bool,
+    pub source: Option<String>,
 }
 
 impl Config {
@@ -101,6 +106,7 @@ impl Config {
             timeout_secs,
             raw_dir,
             passthrough: args.passthrough,
+            source: args.source,
         })
     }
 }

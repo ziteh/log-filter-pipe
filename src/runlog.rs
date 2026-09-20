@@ -14,6 +14,8 @@ struct RunArgs<'a> {
     base_url: &'a str,
     num_ctx: Option<u32>,
     timeout: u64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    source: Option<&'a str>,
 }
 
 /// An execution record for a single `lfp` call, corresponding to a line in `runs.jsonl`.
@@ -102,6 +104,7 @@ impl<'a> RunRecord<'a> {
                 base_url: &cfg.base_url,
                 num_ctx: cfg.num_ctx,
                 timeout: cfg.timeout_secs,
+                source: cfg.source.as_deref(),
             },
             system_prompt: SYSTEM_PROMPT,
             raw_log_path,
@@ -146,6 +149,7 @@ mod tests {
             timeout_secs: 30,
             raw_dir: PathBuf::from("/tmp/lfp"),
             passthrough: false,
+            source: None,
         }
     }
 
@@ -159,6 +163,27 @@ mod tests {
         assert_eq!(json["outcome"], "ok");
         assert!(json.get("reason").is_none());
         assert!(json.get("error_detail").is_none());
+    }
+
+    #[test]
+    fn args_omits_source_when_absent() {
+        let cfg = test_config();
+        let record = RunRecord::ok(&cfg, "/tmp/lfp/lfp-1-2.log".to_string(), 10, 5, 100);
+
+        let json = serde_json::to_value(&record).unwrap();
+
+        assert!(json["args"].get("source").is_none());
+    }
+
+    #[test]
+    fn args_includes_source_when_present() {
+        let mut cfg = test_config();
+        cfg.source = Some("docker compose logs".to_string());
+        let record = RunRecord::ok(&cfg, "/tmp/lfp/lfp-1-2.log".to_string(), 10, 5, 100);
+
+        let json = serde_json::to_value(&record).unwrap();
+
+        assert_eq!(json["args"]["source"], "docker compose logs");
     }
 
     #[test]
