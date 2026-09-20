@@ -11,7 +11,7 @@
 ```bash
 lfp -p/--prompt <TEXT> [-m/--model <NAME>] [--base-url <URL>] [--num-ctx <N>]
     [-t/--timeout <SECS>] [--system-prompt <TEXT>] [--min-bytes <N>] [--max-bytes <N>]
-    [--raw-dir <PATH>] [--passthrough] [--source <TEXT>]
+    [--raw-dir <PATH>] [--passthrough] [--source <TEXT>] [-q/--quiet]
 ```
 
 | Option            | Description                                                                              | Environment variable | Default                  |
@@ -27,6 +27,7 @@ lfp -p/--prompt <TEXT> [-m/--model <NAME>] [--base-url <URL>] [--num-ctx <N>]
 | `--raw-dir`       | Directory for storing raw input                                                          | -                    | `$TMPDIR/lfp`            |
 | `--passthrough`   | Always output the original input while still calling the LLM and writing to `runs.jsonl` | -                    | Not set                  |
 | `--source`        | Source command for the raw input, written to `runs.jsonl` for later analysis             | -                    | Not set                  |
+| `-q, --quiet`     | Suppress the `[lfp] output filtered` stderr diagnostic printed on success                | -                    | Not set                  |
 
 > CLI flags take precedence over environment variables.
 
@@ -48,7 +49,7 @@ echo $?   # Reflects the result of docker compose logs, not lfp
 
 ### Hook
 
-`lfp` can be wired into a [Claude Code](https://claude.com/product/claude-code) `PreToolUse` hook to filter noisy `Bash` output (such as build or install logs) before it reaches the model's context. The hook rewrites the matched command to pipe its output through `lfp`.
+`lfp` can be wired into a [Claude Code](https://claude.com/product/claude-code) `PreToolUse` hook to filter noisy `Bash` output (such as build or install logs) before it reaches the model's context. The hook rewrites the matched command to pipe its output through `lfp`. Use `--quiet` here so the agent doesn't see the raw log path in the diagnostic message and go read it directly, defeating the filtering.
 
 `~/.claude/hooks/lfp-shadow.sh`:
 
@@ -63,7 +64,7 @@ command=$(jq -r '.tool_input.command' <<<"$input")
 new_command=$(jq -rn \
   --arg cmd "$command" \
   --arg prompt "$prompt" \
-  '"set -o pipefail; " + $cmd + " 2>&1 | lfp --passthrough --source " + ($cmd | @sh) + " -p " + ($prompt | @sh)')
+  '"set -o pipefail; " + $cmd + " 2>&1 | lfp --passthrough --quiet --source " + ($cmd | @sh) + " -p " + ($prompt | @sh)')
 
 jq -n --arg cmd "$new_command" '{
   hookSpecificOutput: {

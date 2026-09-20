@@ -77,10 +77,12 @@ fn run(cfg: &Config) {
             } else {
                 print!("{filtered}");
             }
-            eprintln!(
-                "[lfp] output filtered; raw input: {}",
-                raw_log_path.display()
-            );
+            if !cfg.quiet {
+                eprintln!(
+                    "[lfp] output filtered; raw input: {}",
+                    raw_log_path.display()
+                );
+            }
 
             let filtered_log_path = cfg.raw_dir.join(format!("{base_log_name}.filtered.log"));
             let filtered_log_path = std::fs::write(&filtered_log_path, &filtered)

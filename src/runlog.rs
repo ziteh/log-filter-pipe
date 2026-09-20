@@ -185,6 +185,7 @@ mod tests {
             raw_dir: PathBuf::from("/tmp/lfp"),
             passthrough: false,
             source: None,
+            quiet: false,
         }
     }
 

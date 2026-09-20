@@ -66,6 +66,10 @@ pub struct RawArgs {
     /// Source of the raw input (e.g., the upstream command), recorded in the run log for analysis.
     #[arg(long)]
     pub source: Option<String>,
+
+    /// Suppress the "[lfp] output filtered" stderr diagnostic printed on success.
+    #[arg(short, long)]
+    pub quiet: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -81,6 +85,7 @@ pub struct Config {
     pub raw_dir: std::path::PathBuf,
     pub passthrough: bool,
     pub source: Option<String>,
+    pub quiet: bool,
 }
 
 impl Config {
@@ -161,6 +166,7 @@ impl Config {
             raw_dir,
             passthrough: args.passthrough,
             source: args.source,
+            quiet: args.quiet,
         })
     }
 }
